@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import Index from '../views/Index.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
@@ -13,7 +13,7 @@ import Simulator from '../views/Simulator.vue'
 import TerminalBasics from '../views/TerminalBasics.vue'
 
 const router = createRouter({
-  history: createWebHistory('/OS-Mastery_UI/'),
+  history: createWebHashHistory(),
   routes: [
     {
       path: '/',
