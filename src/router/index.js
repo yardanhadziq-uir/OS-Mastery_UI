@@ -13,7 +13,7 @@ import Simulator from '../views/Simulator.vue'
 import TerminalBasics from '../views/TerminalBasics.vue'
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/OS-Mastery_UI/'),
   routes: [
     {
       path: '/',
