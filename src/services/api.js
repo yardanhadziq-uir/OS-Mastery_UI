@@ -1,7 +1,8 @@
 import axios from 'axios'
 
-// Base API URL - use environment variable if set, otherwise fallback to appropriate default
-const API_URL = import.meta.env.VITE_API_URL || '/api'
+// Base API URL - use environment variable if set, otherwise fallback to appropriate default  
+const API_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.DEV ? '/api' : 'https://os-mastery-backend-production.up.railway.app/api')
 
 console.log('🔧 API Configuration:', {
   mode: import.meta.env.MODE,
