@@ -12,7 +12,7 @@
             <button class="theme-toggle" @click="toggleTheme" title="Toggle dark mode">
               {{ isDarkMode ? '☀️' : '🌙' }}
             </button>
-            <router-link to="/profile" class="avatar">YH</router-link>
+            <router-link to="/profile" class="avatar" :title="user?.fullName">{{ initials }}</router-link>
             <button class="logout-btn" @click="handleLogout">Log out</button>
           </div>
         </div>
@@ -22,7 +22,7 @@
     <div class="welcome-content">
       <div class="container">
         <div class="welcome-header">
-          <h1 class="welcome-title">Selamat Datang,<br>Yardan Hadziq.</h1>
+          <h1 class="welcome-title">Selamat Datang,<br>{{ user?.fullName || 'User' }}.</h1>
           <p class="welcome-subtitle">
             Akses semua fitur premium dan simulator terminal langsung dari dashboard Anda.
           </p>
@@ -57,15 +57,41 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
+import { authAPI } from '../services/api'
 
 const router = useRouter()
 const { isDarkMode, toggleTheme } = useTheme()
+const user = ref(null)
+const initials = ref('U')
+const firstName = ref('')
+
+onMounted(() => {
+  // Get user data from localStorage
+  const storedUser = authAPI.getStoredUser()
+  if (storedUser) {
+    user.value = storedUser
+    // Get first name
+    firstName.value = storedUser.fullName.split(' ')[0]
+    // Generate initials from full name
+    const names = storedUser.fullName.split(' ')
+    if (names.length >= 2) {
+      initials.value = (names[0][0] + names[names.length - 1][0]).toUpperCase()
+    } else {
+      initials.value = storedUser.fullName.substring(0, 2).toUpperCase()
+    }
+  } else {
+    // If no user data, redirect to login
+    router.push('/login')
+  }
+})
 
 const handleLogout = () => {
   if (confirm('Apakah Anda yakin ingin keluar?')) {
-    router.push('/')
+    authAPI.logout()
+    router.push('/login')
   }
 }
 </script>

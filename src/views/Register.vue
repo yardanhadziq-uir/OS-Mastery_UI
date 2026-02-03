@@ -85,6 +85,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
 import ToastNotification from '../components/ToastNotification.vue'
+import { authAPI } from '../services/api'
 
 const router = useRouter()
 const { isDarkMode, toggleTheme } = useTheme()
@@ -119,17 +120,27 @@ const passwordStrengthText = computed(() => {
 const handleRegister = async () => {
   isLoading.value = true
   
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1500))
-  
-  isLoading.value = false
-  toastMessage.value = '✅ Pendaftaran berhasil! Selamat datang!'
-  toastType.value = 'success'
-  showToast.value = true
-  
-  setTimeout(() => {
-    router.push('/welcome')
-  }, 1000)
+  try {
+    const response = await authAPI.register({
+      fullName: fullName.value,
+      email: email.value,
+      password: password.value
+    })
+    
+    isLoading.value = false
+    toastMessage.value = `✅ ${response.message}`
+    toastType.value = 'success'
+    showToast.value = true
+    
+    setTimeout(() => {
+      router.push('/welcome')
+    }, 1000)
+  } catch (error) {
+    isLoading.value = false
+    toastMessage.value = `❌ ${error.message || 'Terjadi kesalahan saat mendaftar'}`
+    toastType.value = 'error'
+    showToast.value = true
+  }
 }
 </script>
 

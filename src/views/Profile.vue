@@ -7,9 +7,9 @@
 
       <div class="profile-card">
         <div class="profile-header">
-          <div class="avatar">YH</div>
-          <h2 class="profile-name">Yardan Hadziq</h2>
-          <p class="profile-email">user@student.uir.ac.id</p>
+          <div class="avatar">{{ initials }}</div>
+          <h2 class="profile-name">{{ user?.fullName || 'Loading...' }}</h2>
+          <p class="profile-email">{{ user?.email || 'Loading...' }}</p>
           <span class="status-badge">STATUS: FREE PLAN</span>
         </div>
 
@@ -35,15 +35,38 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
+import { authAPI } from '../services/api'
 
 const router = useRouter()
 const { isDarkMode } = useTheme()
+const user = ref(null)
+const initials = ref('U')
+
+onMounted(() => {
+  // Get user data from localStorage
+  const storedUser = authAPI.getStoredUser()
+  if (storedUser) {
+    user.value = storedUser
+    // Generate initials from full name
+    const names = storedUser.fullName.split(' ')
+    if (names.length >= 2) {
+      initials.value = (names[0][0] + names[names.length - 1][0]).toUpperCase()
+    } else {
+      initials.value = storedUser.fullName.substring(0, 2).toUpperCase()
+    }
+  } else {
+    // If no user data, redirect to login
+    router.push('/login')
+  }
+})
 
 const handleLogout = () => {
   if (confirm('Apakah Anda yakin ingin keluar?')) {
-    router.push('/')
+    authAPI.logout()
+    router.push('/login')
   }
 }
 </script>

@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { authAPI } from '../services/api'
 import Index from '../views/Index.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
@@ -33,17 +34,20 @@ const router = createRouter({
     {
       path: '/profile',
       name: 'profile',
-      component: Profile
+      component: Profile,
+      meta: { requiresAuth: true }
     },
     {
       path: '/welcome',
       name: 'welcome',
-      component: Welcome
+      component: Welcome,
+      meta: { requiresAuth: true }
     },
     {
       path: '/academy',
       name: 'academy',
-      component: Academy
+      component: Academy,
+      meta: { requiresAuth: true }
     },
     {
       path: '/pricing',
@@ -76,6 +80,25 @@ const router = createRouter({
       component: TerminalBasics
     }
   ]
+})
+
+// Navigation guard untuk proteksi route
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = authAPI.isAuthenticated()
+  
+  // Jika route memerlukan autentikasi
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    // Redirect ke login
+    next('/login')
+  } 
+  // Jika sudah login dan mencoba akses login/register, redirect ke welcome
+  else if ((to.path === '/login' || to.path === '/register') && isAuthenticated) {
+    next('/welcome')
+  }
+  // Lanjutkan ke route yang diminta
+  else {
+    next()
+  }
 })
 
 export default router
