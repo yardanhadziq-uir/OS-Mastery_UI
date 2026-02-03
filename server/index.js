@@ -19,8 +19,13 @@ app.use(cors({
     // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true)
     
-    // Allow localhost on any port
+    // Allow localhost on any port (for development)
     if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true)
+    }
+    
+    // Allow GitHub Pages domain
+    if (origin && origin.includes('yardanhadziq-uir.github.io')) {
       return callback(null, true)
     }
     
@@ -29,6 +34,8 @@ app.use(cors({
       return callback(null, true)
     }
     
+    // Log rejected origins for debugging
+    console.log('⚠️ CORS: Origin not allowed:', origin)
     callback(null, false)
   },
   credentials: true,
